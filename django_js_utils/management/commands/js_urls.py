@@ -34,9 +34,14 @@ class Command(BaseCommand):
         Load the module and output all of the patterns
         Recurse on the included modules
         """
-        __import__(module_name)
-        root_urls = sys.modules[module_name]
-        patterns = root_urls.urlpatterns
+        if isinstance(module_name, basestring):
+            __import__(module_name)
+            root_urls = sys.modules[module_name]
+            patterns = root_urls.urlpatterns
+        else:
+            root_urls = module_name
+            patterns = root_urls
+
         for pattern in patterns:
             if issubclass(pattern.__class__, RegexURLPattern):
                 if pattern.name:
