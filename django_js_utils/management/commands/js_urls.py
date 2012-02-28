@@ -20,14 +20,15 @@ class Command(BaseCommand):
         Create urls.js file by parsing all of the urlpatterns in the root urls.py file
         """
         js_patterns = SortedDict()
-        print "Generating Javascript urls file %s" % app_settings.URLS_JS_GENERATED_FILE
+        URLS_JS_GENERATED_FILE = getattr(project_settings, 'URLS_JS_GENERATED_FILE', app_settings.URLS_JS_GENERATED_FILE)
+        print "Generating Javascript urls file %s" % URLS_JS_GENERATED_FILE
         Command.handle_url_module(js_patterns, project_settings.ROOT_URLCONF)
         #output to the file
-        urls_file = open(app_settings.URLS_JS_GENERATED_FILE, "w")
+        urls_file = open(URLS_JS_GENERATED_FILE, "w")
         urls_file.write("dutils.conf.urls = ")
         simplejson.dump(js_patterns, urls_file)
-        print "Done generating Javascript urls file %s" % app_settings.URLS_JS_GENERATED_FILE
-    
+        print "Done generating Javascript urls file %s" % URLS_JS_GENERATED_FILE
+        
     @staticmethod
     def handle_url_module(js_patterns, module_name, prefix=""):
         """
