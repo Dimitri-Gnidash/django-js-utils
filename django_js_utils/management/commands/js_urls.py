@@ -12,7 +12,7 @@ from django_js_utils import settings as app_settings
 
 RE_KWARG = re.compile(r"(\(\?P\<(.*?)\>.*?\))") #Pattern for recongnizing named parameters in urls
 RE_ARG = re.compile(r"(\(.*?\))") #Pattern for recognizing unnamed url parameters
-    
+
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
@@ -27,7 +27,7 @@ class Command(BaseCommand):
         urls_file.write("dutils.conf.urls = ")
         simplejson.dump(js_patterns, urls_file)
         print "Done generating Javascript urls file %s" % app_settings.URLS_JS_GENERATED_FILE
-    
+
     @staticmethod
     def handle_url_module(js_patterns, module_name, prefix=""):
         """
@@ -62,4 +62,6 @@ class Command(BaseCommand):
                     js_patterns[pattern.name] = "/" + full_url
             elif issubclass(pattern.__class__, RegexURLResolver):
                 if pattern.urlconf_name:
-                    Command.handle_url_module(js_patterns, pattern.urlconf_name, prefix=pattern.regex.pattern)
+                    #Added prefix + pattern
+                    #Reason : Prefix now appends recursively
+                    Command.handle_url_module(js_patterns, pattern.urlconf_name, prefix=prefix+pattern.regex.pattern)
