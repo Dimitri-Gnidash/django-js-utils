@@ -62,6 +62,7 @@ class Command(BaseCommand):
                     js_patterns[pattern.name] = "/" + full_url
             elif issubclass(pattern.__class__, RegexURLResolver):
                 if pattern.urlconf_name:
+
                     #Added prefix + pattern
                     #Reason : Prefix now appends recursively
                     Command.handle_url_module(js_patterns, pattern.urlconf_name, prefix=prefix+pattern.regex.pattern)
