@@ -1,34 +1,17 @@
-import sys
+import json
 import re
-
-from django.core.urlresolvers import RegexURLPattern, RegexURLResolver
-from django.core.management.base import BaseCommand
-from django.utils import simplejson
+import sys
+import types
 from django.utils.datastructures import SortedDict
-from django.conf import settings as project_settings
+from django.conf import settings
+from django.http import HttpResponse
+from django.core.urlresolvers import RegexURLPattern, RegexURLResolver
 
-from django_js_utils import settings as app_settings
+def jsurls(request):
 
+    RE_KWARG = re.compile(r"(\(\?P\<(.*?)\>.*?\))") #Pattern for recongnizing named parameters in urls
+    RE_ARG = re.compile(r"(\(.*?\))") #Pattern for recognizing unnamed url parameters
 
-RE_KWARG = re.compile(r"(\(\?P\<(.*?)\>.*?\))") #Pattern for recongnizing named parameters in urls
-RE_ARG = re.compile(r"(\(.*?\))") #Pattern for recognizing unnamed url parameters
-    
-
-class Command(BaseCommand):
-    def handle(self, *args, **options):
-        """
-        Create urls.js file by parsing all of the urlpatterns in the root urls.py file
-        """
-        js_patterns = SortedDict()
-        print "Generating Javascript urls file %s" % app_settings.URLS_JS_GENERATED_FILE
-        Command.handle_url_module(js_patterns, project_settings.ROOT_URLCONF)
-        #output to the file
-        urls_file = open(app_settings.URLS_JS_GENERATED_FILE, "w")
-        urls_file.write("dutils.conf.urls = ")
-        simplejson.dump(js_patterns, urls_file)
-        print "Done generating Javascript urls file %s" % app_settings.URLS_JS_GENERATED_FILE
-    
-    @staticmethod
     def handle_url_module(js_patterns, module_name, prefix=""):
         """
         Load the module and output all of the patterns
@@ -37,6 +20,9 @@ class Command(BaseCommand):
         if isinstance(module_name, basestring):
             __import__(module_name)
             root_urls = sys.modules[module_name]
+            patterns = root_urls.urlpatterns
+        elif isinstance(module_name, types.ModuleType):
+            root_urls = module_name
             patterns = root_urls.urlpatterns
         else:
             root_urls = module_name
@@ -62,4 +48,15 @@ class Command(BaseCommand):
                     js_patterns[pattern.name] = "/" + full_url
             elif issubclass(pattern.__class__, RegexURLResolver):
                 if pattern.urlconf_name:
-                    Command.handle_url_module(js_patterns, pattern.urlconf_name, prefix=pattern.regex.pattern)
+                    handle_url_module(js_patterns, pattern.urlconf_name, prefix=pattern.regex.pattern)
+
+    js_patterns = SortedDict()
+    handle_url_module(js_patterns, settings.ROOT_URLCONF)
+
+    from django.template.loader import get_template
+
+    response = HttpResponse(content_type='text/javascript')
+    response.write('django_js_utils_urlconf = ');
+    json.dump(js_patterns, response)
+    return response
+

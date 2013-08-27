@@ -1,7 +1,6 @@
-var dutils = {};
-dutils.conf = {};
+var django_js_utils = {};
 
-dutils.urls = function(){
+django_js_utils.urls = function(){
 
     function _get_path(name, kwargs, urls)
     {
@@ -42,7 +41,7 @@ dutils.urls = function(){
         resolve: function(name, kwargs, urls) {
             if (!urls)
             {
-                urls = dutils.conf.urls || {};
+                urls = django_js_utils_urlconf || {};
             }
 
             return _get_path(name, kwargs, urls);
