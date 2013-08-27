@@ -55,7 +55,7 @@ def jsurls(request):
 
     from django.template.loader import get_template
 
-    response = HttpResponse(mimetype='text/javascript')
+    response = HttpResponse(content_type='text/javascript')
     response.write('django_js_utils_urlconf = ');
     json.dump(js_patterns, response)
     return response
