@@ -1,10 +1,10 @@
+import json
 import re
 import sys
 import types
 from django.utils.datastructures import SortedDict
 from django.conf import settings
 from django.http import HttpResponse
-import django.utils.simplejson as json
 from django.core.urlresolvers import RegexURLPattern, RegexURLResolver
 
 def jsurls(request):
