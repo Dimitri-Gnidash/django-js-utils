@@ -28,6 +28,10 @@ setup(
 #    maintainer_email='',
 #    url='',
     packages=find_packages(),
+    include_package_data=True,
+    package_data={
+        'static/js': ['*.js']
+    },
     license='MIT',
     classifiers=[
         'Development Status :: 4 - Beta',
