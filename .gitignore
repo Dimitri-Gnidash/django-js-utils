@@ -1,0 +1,3 @@
+*.pyc
+dist/
+django_js_utils.egg-info/

@@ -28,6 +28,7 @@ setup(
 #    maintainer_email='',
 #    url='',
     packages=find_packages(),
+    package_data={'django_js_utils': ['static/js/*.js']},
     license='MIT',
     classifiers=[
         'Development Status :: 4 - Beta',

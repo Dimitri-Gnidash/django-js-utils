@@ -1,10 +1,11 @@
 import sys
 import re
-from django.core.exceptions import ImproperlyConfigured
+from types import ModuleType
 
+from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import RegexURLPattern, RegexURLResolver
 from django.core.management.base import BaseCommand
-from django.utils import simplejson
+import json
 from django.utils.datastructures import SortedDict
 from django.conf import settings
 
@@ -30,7 +31,7 @@ class Command(BaseCommand):
         #output to the file
         urls_file = open(URLS_JS_GENERATED_FILE, "w")
         urls_file.write("dutils.conf.urls = ")
-        simplejson.dump(js_patterns, urls_file)
+        json.dump(js_patterns, urls_file)
         print "Done generating Javascript urls file %s" % URLS_JS_GENERATED_FILE
     
     @staticmethod
@@ -42,6 +43,9 @@ class Command(BaseCommand):
         if isinstance(module_name, basestring):
             __import__(module_name)
             root_urls = sys.modules[module_name]
+            patterns = root_urls.urlpatterns
+        elif isinstance(module_name, ModuleType):
+            root_urls = module_name
             patterns = root_urls.urlpatterns
         else:
             root_urls = module_name
